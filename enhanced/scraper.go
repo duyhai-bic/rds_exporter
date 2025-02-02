@@ -12,7 +12,7 @@ import (
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/percona/rds_exporter/sessions"
+	"github.com/duyhai-bic/rds_exporter/sessions"
 )
 
 // scraper retrieves metrics from several RDS instances sharing a single session.
@@ -44,7 +44,11 @@ func newScraper(session *session.Session, instances []sessions.Instance, logger 
 // start scrapes metrics in loop and sends them to the channel until context is canceled.
 func (s *scraper) start(ctx context.Context, interval time.Duration, ch chan<- map[string][]prometheus.Metric) {
 	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
+	defer func() {
+		ticker.Stop()
+		// Once done, close the channel so that the receiver goroutine can exit.
+		close(ch)
+	}()
 
 	for {
 		select {
@@ -57,7 +61,13 @@ func (s *scraper) start(ctx context.Context, interval time.Duration, ch chan<- m
 		scrapeCtx, cancel := context.WithTimeout(ctx, interval)
 		m, _ := s.scrape(scrapeCtx)
 		cancel()
-		ch <- m
+		select {
+		case ch <- m:
+			// sent metrics successfully.
+		case <-ctx.Done():
+			// Context cancelled while trying to send.
+			return
+		}
 	}
 }
 

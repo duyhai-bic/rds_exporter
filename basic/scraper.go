@@ -9,7 +9,7 @@ import (
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/percona/rds_exporter/config"
+	"github.com/duyhai-bic/rds_exporter/sessions"
 )
 
 var (
@@ -20,7 +20,7 @@ var (
 
 type Scraper struct {
 	// params
-	instance  *config.Instance
+	instance  *sessions.Instance
 	collector *Collector
 	ch        chan<- prometheus.Metric
 
@@ -29,7 +29,7 @@ type Scraper struct {
 	constLabels prometheus.Labels
 }
 
-func NewScraper(instance *config.Instance, collector *Collector, ch chan<- prometheus.Metric) *Scraper {
+func NewScraper(instance *sessions.Instance, collector *Collector, ch chan<- prometheus.Metric) *Scraper {
 	// Create CloudWatch client
 	sess, _ := collector.sessions.GetSession(instance.Region, instance.Instance)
 	if sess == nil {

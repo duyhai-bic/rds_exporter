@@ -10,7 +10,7 @@ import (
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/percona/rds_exporter/sessions"
+	"github.com/duyhai-bic/rds_exporter/sessions"
 )
 
 // Collector collects enhanced RDS metrics by utilizing several scrapers.
@@ -18,8 +18,9 @@ type Collector struct {
 	sessions *sessions.Sessions
 	logger   log.Logger
 
-	rw      sync.RWMutex
-	metrics map[string][]prometheus.Metric
+	rw         sync.RWMutex
+	metrics    map[string][]prometheus.Metric
+	cancelFunc context.CancelFunc
 }
 
 // Maximal and minimal metrics update interval.
@@ -35,6 +36,9 @@ func NewCollector(sessions *sessions.Sessions, logger log.Logger) *Collector {
 		logger:   log.With(logger, "component", "enhanced"),
 		metrics:  make(map[string][]prometheus.Metric),
 	}
+	// Create a cancellable context for all goroutines in this collector.
+	ctx, cancel := context.WithCancel(context.Background())
+	c.cancelFunc = cancel
 
 	for session, instances := range sessions.AllSessions() {
 		enabledInstances := getEnabledInstances(instances)
@@ -52,16 +56,30 @@ func NewCollector(sessions *sessions.Sessions, logger log.Logger) *Collector {
 		level.Info(s.logger).Log("msg", fmt.Sprintf("Updating enhanced metrics every %s.", interval))
 
 		// perform first scrapes synchronously so returned collector has all metric descriptions
+		level.Info(s.logger).Log("msg", "perform first scrapes synchronously so returned collector has all metric descriptions")
 		m, _ := s.scrape(context.TODO())
 		c.setMetrics(m)
 
+		level.Info(s.logger).Log("msg", "Start performing scrapes periodically")
 		ch := make(chan map[string][]prometheus.Metric)
 		go func() {
-			for m := range ch {
-				c.setMetrics(m)
+			for {
+				select {
+				case m, ok := <-ch:
+					if !ok {
+						// Channel closed: exit the goroutine.
+						level.Info(s.logger).Log("msg", "metrics channel closed, exiting goroutine")
+						return
+					}
+					c.setMetrics(m)
+				case <-ctx.Done():
+					// Context cancelled: exit the goroutine.
+					level.Info(s.logger).Log("msg", "context cancelled, exiting metrics updater")
+					return
+				}
 			}
 		}()
-		go s.start(context.TODO(), interval, ch)
+		go s.start(ctx, interval, ch)
 	}
 
 	return c
@@ -86,6 +104,17 @@ func (c *Collector) setMetrics(m map[string][]prometheus.Metric) {
 		c.metrics[id] = metrics
 	}
 	c.rw.Unlock()
+}
+
+func (c *Collector) Update(sessions *sessions.Sessions, logger log.Logger) {
+	level.Info(c.logger).Log("msg", "Cancaling the old enhanced monitoring scraper")
+	c.cancelFunc()
+	level.Info(c.logger).Log("msg", "The old enhanced monitoring scraper has been canceled")
+	newCollector := NewCollector(sessions, logger)
+	c.cancelFunc = newCollector.cancelFunc
+	c.logger = newCollector.logger
+	c.sessions = newCollector.sessions
+	c.metrics = newCollector.metrics
 }
 
 // Describe implements prometheus.Collector.
