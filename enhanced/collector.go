@@ -107,7 +107,7 @@ func (c *Collector) setMetrics(m map[string][]prometheus.Metric) {
 }
 
 func (c *Collector) Update(sessions *sessions.Sessions, logger log.Logger) {
-	level.Info(c.logger).Log("msg", "Cancaling the old enhanced monitoring scraper")
+	level.Info(c.logger).Log("msg", "Canceling the old enhanced monitoring scraper")
 	c.cancelFunc()
 	level.Info(c.logger).Log("msg", "The old enhanced monitoring scraper has been canceled")
 	newCollector := NewCollector(sessions, logger)
