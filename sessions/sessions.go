@@ -25,6 +25,7 @@ type Instance struct {
 	Instance                   string
 	DisableBasicMetrics        bool
 	DisableEnhancedMetrics     bool
+	DisablePerformanceInsights bool
 	ResourceID                 string
 	Labels                     map[string]string
 	EnhancedMonitoringInterval time.Duration
@@ -57,11 +58,12 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 		// re-use session for the same region and key (explicit or empty for implicit) pair
 		if s := sharedSessions[instance.Region+"/"+instance.AWSAccessKey]; s != nil {
 			res.sessions[s] = append(res.sessions[s], Instance{
-				Region:                 instance.Region,
-				Instance:               instance.Instance,
-				Labels:                 instance.Labels,
-				DisableBasicMetrics:    instance.DisableBasicMetrics,
-				DisableEnhancedMetrics: instance.DisableEnhancedMetrics,
+				Region:                     instance.Region,
+				Instance:                   instance.Instance,
+				Labels:                     instance.Labels,
+				DisableBasicMetrics:        instance.DisableBasicMetrics,
+				DisableEnhancedMetrics:     instance.DisableEnhancedMetrics,
+				DisablePerformanceInsights: instance.DisablePerformanceInsights,
 			})
 			continue
 		}
@@ -114,11 +116,12 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 		sharedSessions[instance.Region+"/"+instance.AWSAccessKey] = s
 		for _, identifier := range discoveredInstances {
 			res.sessions[s] = append(res.sessions[s], Instance{
-				Region:                 instance.Region,
-				Instance:               identifier,
-				Labels:                 instance.Labels,
-				DisableBasicMetrics:    instance.DisableBasicMetrics,
-				DisableEnhancedMetrics: instance.DisableEnhancedMetrics,
+				Region:                     instance.Region,
+				Instance:                   identifier,
+				Labels:                     instance.Labels,
+				DisableBasicMetrics:        instance.DisableBasicMetrics,
+				DisableEnhancedMetrics:     instance.DisableEnhancedMetrics,
+				DisablePerformanceInsights: instance.DisablePerformanceInsights,
 			})
 		}
 	}

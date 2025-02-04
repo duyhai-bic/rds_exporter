@@ -18,15 +18,16 @@ import (
 
 // Instance represents a single RDS information from configuration file.
 type Instance struct {
-	Region                 string            `yaml:"region"`
-	Instance               string            `yaml:"instance"`
-	AWSAccessKey           string            `yaml:"aws_access_key"` // may be empty
-	AWSSecretKey           string            `yaml:"aws_secret_key"` // may be empty
-	AWSRoleArn             string            `yaml:"aws_role_arn"`   // may be empty
-	DisableBasicMetrics    bool              `yaml:"disable_basic_metrics"`
-	DisableEnhancedMetrics bool              `yaml:"disable_enhanced_metrics"`
-	Labels                 map[string]string `yaml:"labels"` // may be empty
-	IRSAEnabled            bool              `yaml:"irsa_enabled"`
+	Region                     string            `yaml:"region"`
+	Instance                   string            `yaml:"instance"`
+	AWSAccessKey               string            `yaml:"aws_access_key"` // may be empty
+	AWSSecretKey               string            `yaml:"aws_secret_key"` // may be empty
+	AWSRoleArn                 string            `yaml:"aws_role_arn"`   // may be empty
+	DisableBasicMetrics        bool              `yaml:"disable_basic_metrics"`
+	DisableEnhancedMetrics     bool              `yaml:"disable_enhanced_metrics"`
+	DisablePerformanceInsights bool              `yaml:"disable_performance_insights"`
+	Labels                     map[string]string `yaml:"labels"` // may be empty
+	IRSAEnabled                bool              `yaml:"irsa_enabled"`
 
 	// TODO Type InstanceType `yaml:"type"` // may be empty for old pmm-managed
 }

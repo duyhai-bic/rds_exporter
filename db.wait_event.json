@@ -1,0 +1,127 @@
+{
+    "AlignedStartTime": "2025-02-03T23:41:00+07:00",
+    "AlignedEndTime": "2025-02-03T23:46:00+07:00",
+    "Identifier": "db-KQAK2H4CA4EPY4IHYHDJYIRVKM",
+    "MetricList": [
+        {
+            "Key": {
+                "Metric": "db.load.avg"
+            },
+            "DataPoints": [
+                {
+                    "Timestamp": "2025-02-03T23:42:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:43:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:44:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:45:00+07:00",
+                    "Value": 0.03333333333333333
+                },
+                {
+                    "Timestamp": "2025-02-03T23:46:00+07:00",
+                    "Value": 0.016666666666666666
+                }
+            ]
+        },
+        {
+            "Key": {
+                "Metric": "db.load.avg",
+                "Dimensions": {
+                    "db.wait_event.name": "IO:WALSync",
+                    "db.wait_event.type": "IO"
+                }
+            },
+            "DataPoints": [
+                {
+                    "Timestamp": "2025-02-03T23:42:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:43:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:44:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:45:00+07:00",
+                    "Value": 0.016666666666666666
+                },
+                {
+                    "Timestamp": "2025-02-03T23:46:00+07:00",
+                    "Value": 0.0
+                }
+            ]
+        },
+        {
+            "Key": {
+                "Metric": "db.load.avg",
+                "Dimensions": {
+                    "db.wait_event.name": "Client:ClientRead",
+                    "db.wait_event.type": "Client"
+                }
+            },
+            "DataPoints": [
+                {
+                    "Timestamp": "2025-02-03T23:42:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:43:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:44:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:45:00+07:00",
+                    "Value": 0.016666666666666666
+                },
+                {
+                    "Timestamp": "2025-02-03T23:46:00+07:00",
+                    "Value": 0.0
+                }
+            ]
+        },
+        {
+            "Key": {
+                "Metric": "db.load.avg",
+                "Dimensions": {
+                    "db.wait_event.name": "CPU",
+                    "db.wait_event.type": "CPU"
+                }
+            },
+            "DataPoints": [
+                {
+                    "Timestamp": "2025-02-03T23:42:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:43:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:44:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:45:00+07:00",
+                    "Value": 0.0
+                },
+                {
+                    "Timestamp": "2025-02-03T23:46:00+07:00",
+                    "Value": 0.016666666666666666
+                }
+            ]
+        }
+    ]
+}

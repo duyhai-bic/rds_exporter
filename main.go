@@ -23,12 +23,13 @@ import (
 
 //nolint:lll
 var (
-	listenAddressF       = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9042").String()
-	basicMetricsPathF    = kingpin.Flag("web.basic-telemetry-path", "Path under which to expose exporter's basic metrics.").Default("/basic").String()
-	enhancedMetricsPathF = kingpin.Flag("web.enhanced-telemetry-path", "Path under which to expose exporter's enhanced metrics.").Default("/enhanced").String()
-	configFileF          = kingpin.Flag("config.file", "Path to configuration file.").Default("config.yml").String()
-	logTraceF            = kingpin.Flag("log.trace", "Enable verbose tracing of AWS requests (will log credentials).").Default("false").Bool()
-	logger               = log.NewNopLogger()
+	listenAddressF           = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9042").String()
+	basicMetricsPathF        = kingpin.Flag("web.basic-telemetry-path", "Path under which to expose exporter's basic metrics.").Default("/basic").String()
+	enhancedMetricsPathF     = kingpin.Flag("web.enhanced-telemetry-path", "Path under which to expose exporter's enhanced metrics.").Default("/enhanced").String()
+	performanceInsightsPathF = kingpin.Flag("web.performance-insights-telemetry-path", "Path under which to expose exporter's performance insights metrics.").Default("/performance-insights").String()
+	configFileF              = kingpin.Flag("config.file", "Path to configuration file.").Default("config.yml").String()
+	logTraceF                = kingpin.Flag("log.trace", "Enable verbose tracing of AWS requests (will log credentials).").Default("false").Bool()
+	logger                   = log.NewNopLogger()
 )
 
 func initSession(configFileF *string, client *client.Client, logger log.Logger, logTraceF *bool) (*config.Config, *sessions.Sessions) {
