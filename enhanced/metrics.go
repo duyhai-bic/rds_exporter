@@ -240,7 +240,7 @@ func makeNodeCPUMetrics(s *cpuUtilization, constLabels prometheus.Labels) []prom
 }
 
 // makeRDSDiskIOMetrics returns rdsosmetrics_diskIO_ metrics.
-func makeRDSDiskIOMetrics(s *diskIO, constLabels prometheus.Labels) []prometheus.Metric {
+func makeRDSDiskIOMetrics(s *diskIO, prefix string, constLabels prometheus.Labels) []prometheus.Metric {
 	// move device name to label
 	labelKeys := []string{"device"}
 	labelValues := []string{s.Device}
@@ -254,7 +254,7 @@ func makeRDSDiskIOMetrics(s *diskIO, constLabels prometheus.Labels) []prometheus
 		if name == "device" {
 			continue
 		}
-		desc := prometheus.NewDesc("rdsosmetrics_diskIO_"+name, help, labelKeys, constLabels)
+		desc := prometheus.NewDesc(prefix+name, help, labelKeys, constLabels)
 		m := makeGauge(desc, labelValues, v.Field(i))
 		if m != nil {
 			res = append(res, m)
@@ -482,7 +482,14 @@ func (m *osMetrics) makePrometheusMetrics(region string, labels map[string]strin
 	// res = append(res, metrics...)
 
 	for _, disk := range m.DiskIO {
-		metrics = makeRDSDiskIOMetrics(&disk, constLabels)
+		metrics = makeRDSDiskIOMetrics(&disk, "rdsosmetrics_diskIO_", constLabels)
+		res = append(res, metrics...)
+		// metrics = makeNodeDiskMetrics(&disk, constLabels)
+		// res = append(res, metrics...)
+	}
+
+	for _, phyDevice := range m.PhysicalDeviceIO {
+		metrics = makeRDSDiskIOMetrics(&phyDevice, "rdsosmetrics_physicalDeviceIO_", constLabels)
 		res = append(res, metrics...)
 		// metrics = makeNodeDiskMetrics(&disk, constLabels)
 		// res = append(res, metrics...)
