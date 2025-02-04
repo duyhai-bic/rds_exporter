@@ -1,9 +1,9 @@
-module github.com/percona/rds_exporter
+module github.com/duyhai-bic/rds_exporter
 
 go 1.23
 
 require (
-	github.com/aws/aws-sdk-go v1.36.30
+	github.com/aws/aws-sdk-go v1.55.6
 	github.com/go-kit/log v0.2.0
 	github.com/percona/exporter_shared v0.7.4
 	github.com/prometheus/client_golang v1.14.0

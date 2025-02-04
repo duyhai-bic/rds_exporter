@@ -449,8 +449,8 @@ func (m *osMetrics) makePrometheusMetrics(region string, labels map[string]strin
 	res := make([]prometheus.Metric, 0, 100)
 
 	constLabels := prometheus.Labels{
-		"region":   region,
-		"instance": m.InstanceID,
+		"region":              region,
+		"instance_identifier": m.InstanceID,
 	}
 	for n, v := range labels {
 		if v == "" {
@@ -478,32 +478,32 @@ func (m *osMetrics) makePrometheusMetrics(region string, labels map[string]strin
 
 	metrics := makeGenericMetrics(m.CPUUtilization, "rdsosmetrics_cpuUtilization_", constLabels)
 	res = append(res, metrics...)
-	metrics = makeNodeCPUMetrics(&m.CPUUtilization, constLabels)
-	res = append(res, metrics...)
+	// metrics = makeNodeCPUMetrics(&m.CPUUtilization, constLabels)
+	// res = append(res, metrics...)
 
 	for _, disk := range m.DiskIO {
 		metrics = makeRDSDiskIOMetrics(&disk, constLabels)
 		res = append(res, metrics...)
-		metrics = makeNodeDiskMetrics(&disk, constLabels)
-		res = append(res, metrics...)
+		// metrics = makeNodeDiskMetrics(&disk, constLabels)
+		// res = append(res, metrics...)
 	}
 
 	for _, fs := range m.FileSys {
 		metrics = makeRDSFileSysMetrics(&fs, constLabels)
 		res = append(res, metrics...)
-		metrics = makeNodeFilesystemMetrics(&fs, constLabels)
-		res = append(res, metrics...)
+		// metrics = makeNodeFilesystemMetrics(&fs, constLabels)
+		// res = append(res, metrics...)
 	}
 
 	metrics = makeGenericMetrics(m.LoadAverageMinute, "rdsosmetrics_loadAverageMinute_", constLabels)
 	res = append(res, metrics...)
-	metrics = makeNodeLoadMetrics(&m.LoadAverageMinute, constLabels)
-	res = append(res, metrics...)
+	// metrics = makeNodeLoadMetrics(&m.LoadAverageMinute, constLabels)
+	// res = append(res, metrics...)
 
 	metrics = makeGenericMetrics(m.Memory, "rdsosmetrics_memory_", constLabels)
 	res = append(res, metrics...)
-	metrics = makeNodeMemoryMetrics(&m.Memory, constLabels)
-	res = append(res, metrics...)
+	// metrics = makeNodeMemoryMetrics(&m.Memory, constLabels)
+	// res = append(res, metrics...)
 
 	for _, n := range m.Network {
 		metrics = makeRDSNetworkMetrics(&n, constLabels)
@@ -511,21 +511,21 @@ func (m *osMetrics) makePrometheusMetrics(region string, labels map[string]strin
 		// we can't make node_exporter-like metrics: AWS gives us rates, node_exporter - total counters
 	}
 
-	for _, p := range m.ProcessList {
-		metrics = makeRDSProcessListMetrics(&p, constLabels)
-		res = append(res, metrics...)
-		// no node_exporter-like metrics
-	}
+	// for _, p := range m.ProcessList {
+	// 	metrics = makeRDSProcessListMetrics(&p, constLabels)
+	// 	res = append(res, metrics...)
+	// 	// no node_exporter-like metrics
+	// }
 
 	metrics = makeGenericMetrics(m.Swap, "rdsosmetrics_swap_", constLabels)
 	res = append(res, metrics...)
-	metrics = makeNodeMemorySwapMetrics(&m.Swap, constLabels)
-	res = append(res, metrics...)
+	// metrics = makeNodeMemorySwapMetrics(&m.Swap, constLabels)
+	// res = append(res, metrics...)
 
 	metrics = makeGenericMetrics(m.Tasks, "rdsosmetrics_tasks_", constLabels)
 	res = append(res, metrics...)
-	metrics = makeNodeProcsMetrics(&m.Tasks, constLabels)
-	res = append(res, metrics...)
+	// metrics = makeNodeProcsMetrics(&m.Tasks, constLabels)
+	// res = append(res, metrics...)
 
 	return res
 }

@@ -15,7 +15,8 @@ import (
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 
-	"github.com/percona/rds_exporter/config"
+	"github.com/duyhai-bic/rds_exporter/config"
+	"github.com/duyhai-bic/rds_exporter/discovery"
 )
 
 // Instance represents a single RDS instance information in runtime.
@@ -100,14 +101,26 @@ func New(instances []config.Instance, client *http.Client, logger log.Logger, tr
 		if err != nil {
 			return nil, err
 		}
+		// Discover rds instances if no instance specified
+		discoveredInstances := []string{}
+		if instance.Instance == "" {
+			discoveredInstances, err = discovery.New(s)
+			if err != nil {
+				level.Error(logger).Log("msg", "Failed to discover rds instances.", "error", err)
+			}
+		} else {
+			discoveredInstances = append(discoveredInstances, instance.Instance)
+		}
 		sharedSessions[instance.Region+"/"+instance.AWSAccessKey] = s
-		res.sessions[s] = append(res.sessions[s], Instance{
-			Region:                 instance.Region,
-			Instance:               instance.Instance,
-			Labels:                 instance.Labels,
-			DisableBasicMetrics:    instance.DisableBasicMetrics,
-			DisableEnhancedMetrics: instance.DisableEnhancedMetrics,
-		})
+		for _, identifier := range discoveredInstances {
+			res.sessions[s] = append(res.sessions[s], Instance{
+				Region:                 instance.Region,
+				Instance:               identifier,
+				Labels:                 instance.Labels,
+				DisableBasicMetrics:    instance.DisableBasicMetrics,
+				DisableEnhancedMetrics: instance.DisableEnhancedMetrics,
+			})
+		}
 	}
 
 	// add resource ID to all instances
@@ -217,7 +230,16 @@ func buildCredentials(instance config.Instance) (*credentials.Credentials, error
 			},
 		}), nil
 	}
-	return nil, nil
+	// Use the default credential provider chain, which includes the service account role credentials.
+	stsSession, err := session.NewSession(&aws.Config{
+		Region:                        aws.String(instance.Region),
+		CredentialsChainVerboseErrors: aws.Bool(true),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+	return stsSession.Config.Credentials, nil
 }
 
 // AllSessions returns all sessions and instances.

@@ -9,8 +9,8 @@ import (
 	"github.com/go-kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/percona/rds_exporter/config"
-	"github.com/percona/rds_exporter/sessions"
+	"github.com/duyhai-bic/rds_exporter/config"
+	"github.com/duyhai-bic/rds_exporter/sessions"
 )
 
 //go:generate go run generate/main.go generate/utils.go
@@ -47,6 +47,11 @@ func New(config *config.Config, sessions *sessions.Sessions, logger log.Logger) 
 	}
 }
 
+func (e *Collector) Update(config *config.Config, sessions *sessions.Sessions) {
+	e.config = config
+	e.sessions = sessions
+}
+
 func (e *Collector) Describe(ch chan<- *prometheus.Desc) {
 	// unchecked collector
 }
@@ -62,24 +67,25 @@ func (e *Collector) Collect(ch chan<- prometheus.Metric) {
 func (e *Collector) collect(ch chan<- prometheus.Metric) {
 	var wg sync.WaitGroup
 	defer wg.Wait()
-
-	for _, instance := range e.config.Instances {
-		if instance.DisableBasicMetrics {
-			level.Debug(e.l).Log("msg", fmt.Sprintf("Instance %s has disabled basic metrics, skipping.", instance))
-			continue
-		}
-		instance := instance
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			s := NewScraper(&instance, e, ch)
-			if s == nil {
-				level.Error(e.l).Log("msg", fmt.Sprintf("No scraper for %s, skipping.", instance))
-				return
+	for _, instances := range e.sessions.AllSessions() {
+		for _, instance := range instances {
+			if instance.DisableBasicMetrics {
+				level.Debug(e.l).Log("msg", fmt.Sprintf("Instance %s has disabled basic metrics, skipping.", instance))
+				continue
 			}
-			s.Scrape()
-		}()
+			instance := instance
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+
+				s := NewScraper(&instance, e, ch)
+				if s == nil {
+					level.Error(e.l).Log("msg", fmt.Sprintf("No scraper for %s, skipping.", instance))
+					return
+				}
+				s.Scrape()
+			}()
+		}
 	}
 }
 
